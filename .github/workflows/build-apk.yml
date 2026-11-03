@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -15,6 +16,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: 'npm'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -25,13 +27,27 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Sync Capacitor Android
-        run: node ./node_modules/@capacitor/cli/bin/capacitor sync androidandroid
-
-      - name: Build Android APK
+      - name: Sync Capacitor and Build APK
         run: |
+          echo "Starting Capacitor Sync..."
+
+          node ./node_modules/@capacitor/cli/bin/capacitor sync android
+
+          echo "Checking Capacitor Gradle settings..."
+
+          if [ ! -f android/capacitor.settings.gradle ]; then
+            echo "ERROR: capacitor.settings.gradle was not generated!"
+            echo "Android directory contents:"
+            ls -la android/
+            exit 1
+          fi
+
+          echo "Capacitor sync completed successfully."
+
           cd android
+
           chmod +x gradlew
+
           ./gradlew assembleDebug
 
       - name: Upload APK Artifact
@@ -39,3 +55,4 @@ jobs:
         with:
           name: app-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
