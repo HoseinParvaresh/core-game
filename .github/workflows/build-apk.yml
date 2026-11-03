@@ -25,6 +25,9 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Grant execution permission to Capacitor CLI
+        run: chmod +x ./node_modules/.bin/cap
+
       - name: Sync Capacitor Android
         run: npx cap sync android
 
