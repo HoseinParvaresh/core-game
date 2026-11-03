@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Core — icon maker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body { margin: 0; background: #05060d; color: #8794b8; font: 14px/1.5 system-ui, sans-serif; text-align: center; }
+    canvas { margin: 8px; border-radius: 22%; background: #000; }
+    button { font: inherit; padding: 10px 18px; margin: 12px; border-radius: 999px; border: 1px solid #8ff5ff; background: #0a1022; color: #e8f3ff; cursor: pointer; }
+    p { max-width: 560px; margin: 14px auto; }
+  </style>
+</head>
+<body>
+  <p>Renders the app icons from the <b>same art as the game</b> (js/art.js + js/sprites.js).
+     Serve the project over http, open this page, press <b>Download all</b>, and put the four PNGs into <b>/icons</b>.
+     Then bump VERSION in service-worker.js.</p>
+  <div id="out"></div>
+  <button id="dl">Download all</button>
+  <script type="module">
+    import { CONFIG } from '../js/config.js';
+    import { ENEMY_ART, CORE_ART } from '../js/art.js';
+    import { buildSet, drawSet, buildBackdrop, getGlow } from '../js/sprites.js';
+
+    const CORE = '#8ff5ff';
+    const SPECS = [['icon-192.png', 192, 1], ['icon-512.png', 512, 1], ['icon-maskable-512.png', 512, 0.74], ['apple-touch-icon.png', 180, 1]];
+
+    /** One icon: the Core under attack by a Dart, a Bulwark and a Needle. `art` < 1 keeps everything inside the maskable safe zone. */
+    function renderIcon(N, art = 1) {
+      const cv = document.createElement('canvas');
+      cv.width = cv.height = N;
+      const ctx = cv.getContext('2d');
+      const bd = buildBackdrop(N, N, N / 256);
+      ctx.drawImage(bd.cv, -bd.m, -bd.m);
+
+      const S = (N / 512) * art * 3.6;                       // device px per world unit
+      const view = { ctx, S, ox: N / 2, oy: N / 2 };
+      ctx.globalCompositeOperation = 'lighter';
+
+      ctx.setTransform(S, 0, 0, S, N / 2, N / 2);            // aura
+      ctx.globalAlpha = 0.55;
+      ctx.drawImage(getGlow(CORE), -62, -62, 124, 124);
+      ctx.globalAlpha = 1;
+
+      const D = 50, attackers = [['triangle', -90], ['square', 30], ['diamond', 150]];
+      for (const [key, deg] of attackers) {                  // enemies, nose pointed at the Core
+        const def = CONFIG.enemies[key], a = (deg * Math.PI) / 180;
+        const set = buildSet(ENEMY_ART[key], def.color, def.radius, S, key);
+        drawSet(view, set, Math.cos(a) * D, Math.sin(a) * D, a + Math.PI, 0.9, 0.4, 1.12, 1, false, 1, false);
+      }
+      const core = buildSet(CORE_ART, CORE, CONFIG.core.radius, S, 'core');
+      drawSet(view, core, 0, 0, 0, 0.9, 0, 1.08, 1, false, 1, false);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalCompositeOperation = 'source-over';
+      return cv;
+    }
+
+    const out = document.getElementById('out');
+    const canvases = SPECS.map(([name, size, art]) => {
+      const c = renderIcon(size, art);
+      c.title = name; c.style.width = Math.min(size, 256) + 'px';
+      out.append(c);
+      return [name, c];
+    });
+    document.getElementById('dl').onclick = () => canvases.forEach(([name, c], i) => setTimeout(() => {
+      const a = document.createElement('a'); a.download = name; a.href = c.toDataURL('image/png'); a.click();
+    }, i * 250));
+    window.renderIcon = (size, art) => renderIcon(size, art).toDataURL('image/png');
+  </script>
+</body>
+</html>

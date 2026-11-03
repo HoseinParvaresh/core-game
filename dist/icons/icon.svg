@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="72%"><stop offset="0" stop-color="#0d1638"/><stop offset="1" stop-color="#05060d"/></radialGradient>
+    <radialGradient id="aura"><stop offset="0" stop-color="#8ff5ff" stop-opacity=".55"/><stop offset="1" stop-color="#8ff5ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="core"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#bff8ff"/><stop offset="1" stop-color="#8ff5ff"/></radialGradient>
+    <filter id="blur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
+    <g id="art" fill="none" stroke-linejoin="round" stroke-linecap="round" stroke-width="8">
+      <path d="M256.0 134.0 L195.3 16.5 L256.0 44.2 L316.7 16.5 Z" stroke="#ff4fd8" fill="#ff4fd8" fill-opacity=".25"/>
+      <path d="M256.0 108.9 L227.0 50.8 L256.0 62.7 L285.0 50.8 Z" stroke="#ffe0f8" stroke-width="4" fill="#ffe0f8" fill-opacity=".5"/>
+      <path d="M163.3 309.5 L116.4 378.2 L41.2 380.0 L80.4 315.8 Z" stroke="#c6ff3d" fill="#c6ff3d" fill-opacity=".25"/>
+      <path d="M163.3 309.5 L88.0 353.0 L41.2 380.0" stroke="#f7ffd6" stroke-width="3.5" opacity=".7"/>
+      <path d="M464.1 395.3 L373.6 395.3 L373.6 304.7 L464.1 304.7 Z" stroke="#ffb02e" fill="#ffb02e" fill-opacity=".2"/>
+      <path d="M454.2 385.4 L383.5 385.4 L383.5 314.6 L454.2 314.6 Z" stroke="#fff0c4" stroke-width="3" opacity=".6"/>
+      <path d="M443.4 365.0 L423.1 358.5 L416.6 378.7 L403.8 374.6 L410.3 354.3 L390.1 347.7 L394.3 335.0 L414.5 341.5 L421.1 321.3 L433.9 325.4 L427.3 345.7 L447.5 352.3 Z" stroke="#fff0c4" stroke-width="3.5" fill="#fff0c4" fill-opacity=".45"/>
+      <circle cx="256" cy="256" r="104" stroke="#8ff5ff" stroke-width="9" stroke-dasharray="64 25"/>
+      <circle cx="256" cy="256" r="80" stroke="#fff" stroke-width="6" stroke-dasharray="110 70" opacity=".85"/>
+    </g>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="150" fill="url(#aura)"/>
+  <use href="#art" filter="url(#blur)" opacity=".95"/>
+  <use href="#art"/>
+  <circle cx="256" cy="256" r="58" fill="url(#core)"/>
+  <circle cx="256.0" cy="54.8" r="13" fill="#fff"/>
+  <circle cx="141.0" cy="322.4" r="10" fill="#fff"/>
+  <circle cx="418.8" cy="350.0" r="13" fill="#fff"/>
+</svg>

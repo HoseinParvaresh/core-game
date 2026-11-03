@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Core — art gallery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #05060d;
+        color: #8794b8;
+        font:
+          13px/1.4 system-ui,
+          sans-serif;
+      }
+      canvas {
+        display: block;
+        margin: 0 auto;
+        max-width: 100%;
+      }
+      p {
+        text-align: center;
+        margin: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <p>
+      Core art gallery — all 22 enemy/unit sprites, 12 bosses &amp; 8 Core
+      chassis from <b>js/art.js</b> animated in real time.
+    </p>
+    <canvas id="c" width="1280" height="2180"></canvas>
+    <script type="module">
+      import { CONFIG } from "../js/config.js";
+      import {
+        ENEMY_ART,
+        BOSS_ART,
+        CORE_ART,
+        CHASSIS_ART,
+        CHASSIS_AWAKENED_ART,
+        ORBITER_ART,
+      } from "../js/art.js";
+      import {
+        buildSet,
+        drawSet,
+        buildBolt,
+        buildShield,
+        buildField,
+      } from "../js/sprites.js";
+
+      const cv = document.getElementById("c"),
+        ctx = cv.getContext("2d");
+      const view = { ctx, S: 3, ox: 0, oy: 0 };
+      const CORE = "#8ff5ff";
+
+      const enemies = Object.keys(ENEMY_ART).map((k) => ({
+        key: k,
+        def: CONFIG.enemies[k],
+        S: 2.6,
+        art: ENEMY_ART[k],
+      }));
+      const bosses = CONFIG.bosses.map((B, i) => ({
+        key: B.name,
+        def: B,
+        S: 1.85,
+        art: BOSS_ART[i % BOSS_ART.length],
+      }));
+      for (const e of [...enemies, ...bosses]) {
+        e.set = buildSet(e.art, e.def.color, e.def.radius, e.S, e.key);
+      }
+
+      const chassisStd = CONFIG.chassis.map((ch) => ({
+        label: ch.name,
+        set: buildSet(
+          CHASSIS_ART[ch.id] || CORE_ART,
+          ch.color,
+          CONFIG.core.radius,
+          3.0,
+          `std_${ch.id}`,
+        ),
+      }));
+      const chassisAwk = CONFIG.chassis.map((ch) => ({
+        label: ch.awakenedName,
+        set: buildSet(
+          CHASSIS_AWAKENED_ART[ch.id] || CORE_ART,
+          ch.color,
+          CONFIG.core.radius,
+          3.0,
+          `awk_${ch.id}`,
+        ),
+      }));
+
+      const coreHurt = buildSet(
+        CORE_ART,
+        "#ff4d5e",
+        CONFIG.core.radius,
+        3.2,
+        "coreHurt",
+      );
+      const orbiter = buildSet(
+        ORBITER_ART,
+        CORE,
+        CONFIG.upgrades.orbiters.size,
+        4,
+        "orb",
+      );
+      const bolt = buildBolt(3, CORE),
+        crit = buildBolt(3, "#ffd23d");
+      const shield = buildShield(2.6),
+        field = buildField(0.95);
+
+      const label = (t, x, y) => {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#8794b8";
+        ctx.font = "12px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText(t, x, y);
+        ctx.globalCompositeOperation = "lighter";
+      };
+
+      function frame(now) {
+        const t = now / 1000;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalCompositeOperation = "source-over";
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#070a1c";
+        ctx.fillRect(0, 0, cv.width, cv.height);
+        ctx.globalCompositeOperation = "lighter";
+
+        // 22 enemies & arena units in a 6x4 grid
+        enemies.forEach((e, i) => {
+          const col = i % 6,
+            row = Math.floor(i / 6);
+          view.S = e.S;
+          view.ox = 120 + col * 205;
+          view.oy = 100 + row * 195;
+          drawSet(view, e.set, 0, 0, 0, t, 0.6, 1, 1, false, 1, false);
+          label(`${e.def.name} (${e.key})`, view.ox, view.oy + 78);
+        });
+
+        // 12 bosses in a 6x2 grid
+        bosses.forEach((b, i) => {
+          const col = i % 6,
+            row = Math.floor(i / 6);
+          view.S = b.S;
+          view.ox = 120 + col * 205;
+          view.oy = 940 + row * 250;
+          drawSet(view, b.set, 0, 0, 0.0, t, 0, 1, 1, false, 1, false);
+          label(b.key, view.ox, view.oy + 115);
+        });
+
+        // 4 Standard + 4 Awakened Core Chassis
+        chassisStd.forEach((c, i) => {
+          view.S = 3.0;
+          view.ox = 200 + i * 290;
+          view.oy = 1480;
+          drawSet(
+            view,
+            c.set,
+            0,
+            0,
+            0,
+            t,
+            0,
+            1 + 0.05 * Math.sin(t * 2.3),
+            1,
+            false,
+            1,
+            false,
+          );
+          label(c.label, view.ox, 1575);
+        });
+
+        chassisAwk.forEach((c, i) => {
+          view.S = 3.0;
+          view.ox = 200 + i * 290;
+          view.oy = 1710;
+          drawSet(
+            view,
+            c.set,
+            0,
+            0,
+            0,
+            t,
+            0,
+            1 + 0.05 * Math.sin(t * 2.3),
+            1,
+            false,
+            1,
+            false,
+          );
+          label(`${c.label} (Lv5)`, view.ox, 1810);
+        });
+
+        // Hurt core, orbiter, bolts, shield, slow field
+        view.S = 3.2;
+        view.ox = 180;
+        view.oy = 1990;
+        drawSet(view, coreHurt, 0, 0, 0, t, 0, 1, 1, false, 1, false);
+        label("core (hurt)", 180, 2095);
+
+        view.S = 4;
+        view.ox = 360;
+        drawSet(view, orbiter, 0, 0, 0, t, 0, 1, 1, false, 1, false);
+        label("orbiter", 360, 2095);
+
+        ctx.setTransform(3, 0, 0, 3, 540, 1970);
+        ctx.drawImage(bolt.img, -bolt.head, -bolt.h / 2, bolt.u, bolt.h);
+        ctx.setTransform(3, 0, 0, 3, 540, 2010);
+        ctx.drawImage(crit.img, -crit.head, -crit.h / 2, crit.u, crit.h);
+        label("bolts", 520, 2095);
+
+        ctx.setTransform(2.6, 0, 0, 2.6, 740, 1990);
+        ctx.rotate(t * 0.3);
+        ctx.drawImage(
+          shield.img,
+          -shield.half,
+          -shield.half,
+          shield.u,
+          shield.u,
+        );
+        label("shield", 740, 2095);
+
+        const k = 0.58;
+        ctx.setTransform(0.95 * k, 0, 0, 0.95 * k, 1020, 1990);
+        ctx.rotate(-t * 0.15);
+        ctx.drawImage(field.img, -field.half, -field.half, field.u, field.u);
+        label("slow field", 1020, 2095);
+
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    </script>
+  </body>
+</html>

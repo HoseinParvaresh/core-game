@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#05060d" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="Core" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta
+      name="description"
+      content="Core: a minimalist neon arcade game. Hold the line, one wave at a time."
+    />
+    <title>Core</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body data-state="menu" data-screen="splash">
+    <canvas id="game" aria-label="Game field"></canvas>
+
+    <!-- ───────── HUD ───────── -->
+    <div id="hud">
+      <div class="hud-wave"><span>WAVE</span> <b id="hud-wave">1</b></div>
+      <div class="hud-score">
+        <div id="hud-score" class="score">0</div>
+        <div id="hud-combo" class="combo" data-m="1">
+          <span class="combo-x">x</span><b id="hud-mult">1</b>
+        </div>
+        <div class="combo-bar"><i id="hud-combo-bar"></i></div>
+      </div>
+    </div>
+    <button id="btn-pause" class="pause-btn" aria-label="Pause">
+      <span></span><span></span>
+    </button>
+
+    <div id="banner" class="banner" aria-live="polite">
+      <div class="banner-main"></div>
+      <div class="banner-sub"></div>
+    </div>
+    <div id="toast" class="toast" aria-live="polite">
+      <b class="toast-title"></b>
+      <span class="toast-sub"></span>
+    </div>
+
+    <!-- ───────── Splash ───────── -->
+    <section
+      id="screen-splash"
+      class="screen full splash active"
+      aria-label="Core"
+    >
+      <div class="splash-mark" data-wordmark="draw"></div>
+    </section>
+
+    <!-- ───────── Main menu (6-World + Endless Navigation) ───────── -->
+    <section id="screen-menu" class="screen full menu">
+      <header class="menu-top">
+        <button
+          id="btn-stats"
+          class="icon-btn"
+          aria-label="Stats & Achievements"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="13" width="4" height="7" rx="1" class="f" />
+            <rect x="10" y="9" width="4" height="11" rx="1" class="f" />
+            <rect x="16" y="4" width="4" height="16" rx="1" class="f" />
+          </svg>
+        </button>
+        <div class="menu-mark" data-wordmark></div>
+        <button id="btn-settings" class="icon-btn" aria-label="Settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" class="f" />
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <div class="menu-dock">
+        <div class="world-card">
+          <div class="world-header">
+            <button
+              id="btn-world-prev"
+              class="world-nav"
+              aria-label="Previous World"
+            >
+              ‹
+            </button>
+            <div class="world-title">
+              <span id="menu-world-code" class="world-code">WORLD I</span>
+              <b id="menu-world-name">Cyber Nexus</b>
+              <small id="menu-world-sub">Data Gateways orbit the Core</small>
+            </div>
+            <button
+              id="btn-world-next"
+              class="world-nav"
+              aria-label="Next World"
+            >
+              ›
+            </button>
+          </div>
+
+          <div
+            id="menu-tiers"
+            class="tier-tabs"
+            role="tablist"
+            aria-label="Difficulty Tier"
+          >
+            <button class="tier-tab active" data-tier="0" role="tab">
+              <span class="t-name">Easy</span>
+              <small class="t-waves">10 Waves</small>
+            </button>
+            <button class="tier-tab" data-tier="1" role="tab">
+              <span class="t-name">Medium</span>
+              <small class="t-waves">15 Waves</small>
+            </button>
+            <button class="tier-tab" data-tier="2" role="tab">
+              <span class="t-name">Hard</span>
+              <small class="t-waves">20 Waves</small>
+            </button>
+            <button class="tier-tab" data-tier="3" role="tab">
+              <span class="t-name">Endless</span>
+              <small class="t-waves">∞ Waves</small>
+            </button>
+          </div>
+
+          <div id="menu-tier-meta" class="tier-meta">
+            Boss: W10 · Clear Bonus: +50 Shards
+          </div>
+
+          <button
+            id="btn-unlock-all-menu"
+            class="free-shards-btn"
+            style="align-self: center; margin-top: 2px"
+            title="Unlock all 6 Worlds, Endless Mode and 18 Boss Runes for testing"
+          >
+            Unlock All Stages
+          </button>
+        </div>
+
+        <nav class="menu-actions">
+          <button id="btn-play" class="btn btn-primary">Play</button>
+          <button id="btn-upgrades" class="btn">Upgrades</button>
+          <button id="btn-shop" class="btn">Shop</button>
+        </nav>
+      </div>
+    </section>
+
+    <!-- ───────── Upgrade cards (between waves) ───────── -->
+    <section
+      id="screen-cards"
+      class="screen cards"
+      aria-label="Choose an upgrade"
+    >
+      <h2 class="cards-title">Choose an upgrade</h2>
+      <div id="cards-list" class="cards-list"></div>
+      <button id="btn-reroll" class="reroll-btn">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M3.5 11A8.5 8.5 0 0 1 18.2 5.2M20.5 13A8.5 8.5 0 0 1 5.8 18.8"
+          />
+          <polygon class="f" points="18.5 1.8 20.5 7.2 14.8 6.2" />
+          <polygon class="f" points="5.5 22.2 3.5 16.8 9.2 17.8" />
+          <circle cx="12" cy="12" r="1.5" />
+        </svg>
+        <span>Reroll</span> <b id="reroll-count">1</b>
+      </button>
+    </section>
+
+    <!-- ───────── Pause (Minimal: Resume & Menu only) ───────── -->
+    <section id="screen-pause" class="screen pause" aria-label="Paused">
+      <div class="panel pause-minimal">
+        <h2 class="panel-title">PAUSED</h2>
+        <button id="btn-resume" class="btn btn-primary">Resume</button>
+        <button id="btn-quit" class="btn">Menu</button>
+      </div>
+    </section>
+
+    <!-- ───────── Game over / Victory ───────── -->
+    <section id="screen-over" class="screen full over" aria-label="Run Summary">
+      <div class="panel">
+        <div id="over-record" class="record" aria-hidden="true">
+          <span id="over-banner-txt">NEW RECORD</span>
+        </div>
+        <div id="over-unlock" class="over-unlock"></div>
+        <div class="over-label">Score</div>
+        <div id="over-score" class="over-score">0</div>
+        <dl class="over-grid">
+          <div>
+            <dt>Wave reached</dt>
+            <dd id="over-wave">0</dd>
+          </div>
+          <div>
+            <dt>Destroyed</dt>
+            <dd id="over-kills">0</dd>
+          </div>
+          <div>
+            <dt>Shards earned</dt>
+            <dd id="over-shards" class="gold">+0</dd>
+          </div>
+          <div>
+            <dt>Best score</dt>
+            <dd id="over-best">0</dd>
+          </div>
+        </dl>
+        <button id="btn-again" class="btn btn-primary">Play again</button>
+        <button id="btn-over-upgrades" class="btn">Upgrades</button>
+        <button id="btn-over-menu" class="btn">Menu</button>
+      </div>
+    </section>
+
+    <!-- ───────── Permanent Upgrades: Interactive 33-Node Skill Tree & Core Armory ───────── -->
+    <section
+      id="screen-upgrades"
+      class="screen full sub upgrades-screen"
+      aria-label="Upgrades"
+    >
+      <header class="sub-head">
+        <button class="back" data-back aria-label="Back">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 19l-7-7 7-7" />
+            <path d="M9 12h11" stroke-dasharray="2 2" />
+          </svg>
+        </button>
+        <div class="up-mode-tabs" role="tablist">
+          <button
+            class="up-tab active"
+            data-up-tab="tree"
+            role="tab"
+            aria-selected="true"
+          >
+            Skill Tree
+          </button>
+          <button
+            class="up-tab"
+            data-up-tab="armory"
+            role="tab"
+            aria-selected="false"
+          >
+            Core Armory
+          </button>
+        </div>
+        <div class="up-wallet">
+          <div class="pill">
+            <svg class="shard-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <polygon class="f" points="12 2 19 9 12 22 5 9" />
+              <polygon points="12 2 19 9 12 22 5 9" />
+              <polyline points="5 9 12 12 19 9" />
+              <line x1="12" y1="2" x2="12" y2="22" />
+              <polyline points="8.5 5.5 12 9 15.5 5.5" />
+            </svg>
+            <b id="up-shards">0</b>
+          </div>
+          <button
+            id="btn-free-shards"
+            class="free-shards-btn"
+            title="Add 1,000 Shards"
+          >
+            +1,000
+          </button>
+          <button
+            id="btn-unlock-all-up"
+            class="free-shards-btn"
+            title="Unlock all 6 Worlds, Endless Mode and 18 Boss Runes"
+          >
+            Unlock All
+          </button>
+        </div>
+      </header>
+
+      <!-- View 1: Pannable & Zoomable 33-Node Branching Skill Tree -->
+      <div id="up-tree-view" class="up-view active">
+        <div
+          id="tree-viewport"
+          class="tree-viewport"
+          aria-label="Interactive Skill Tree"
+        >
+          <div id="tree-board" class="tree-board">
+            <svg
+              id="tree-lines"
+              class="tree-lines"
+              viewBox="0 0 1200 900"
+              aria-hidden="true"
+            ></svg>
+            <div id="tree-nodes" class="tree-nodes"></div>
+          </div>
+
+          <div class="tree-zoom-controls">
+            <button id="btn-zoom-in" class="zoom-btn" aria-label="Zoom In">
+              +
+            </button>
+            <button id="btn-zoom-out" class="zoom-btn" aria-label="Zoom Out">
+              −
+            </button>
+            <button
+              id="btn-zoom-reset"
+              class="zoom-btn"
+              aria-label="Center Tree"
+            >
+              ⟲
+            </button>
+          </div>
+
+          <div class="tree-legend">
+            <span><i style="background: #ff4d5e"></i>Offense</span>
+            <span><i style="background: #4db8ff"></i>Defense</span>
+            <span><i style="background: #2effb4"></i>Tactical</span>
+            <span><i style="background: #ffd23d"></i>Economy</span>
+          </div>
+        </div>
+
+        <!-- Selected Node Inspector Dock -->
+        <div id="tree-inspector" class="tree-inspector">
+          <div class="insp-left">
+            <span id="insp-ico" class="insp-ico"></span>
+            <div class="insp-info">
+              <div class="insp-head">
+                <b id="insp-name">Core Awakening</b>
+                <span id="insp-lv" class="insp-lv">MAX</span>
+              </div>
+              <p id="insp-desc">Central neural reactor online</p>
+              <div id="insp-pips" class="pips"></div>
+            </div>
+          </div>
+          <button id="btn-buy-node" class="buy maxed" disabled>Max</button>
+        </div>
+      </div>
+
+      <!-- View 2: Core Armory (Chassis + 18 Upgradable Boss Runes only) -->
+      <div id="up-armory-view" class="up-view">
+        <div class="scroll armory-scroll">
+          <div class="armory-sec-head">
+            <span>CORE CHASSIS (LV 5 = AWAKENED FORM)</span>
+          </div>
+          <div id="armory-list" class="armory-list"></div>
+
+          <div class="armory-sec-head runes-sec-head">
+            <span>BOSS RUNES (UPGRADE LV 1 → 3)</span>
+            <b id="runes-equipped-count">Equipped: 0 / 2</b>
+          </div>
+          <div id="runes-list" class="runes-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Dedicated 5-Category Tabbed Shop Screen ───────── -->
+    <section id="screen-shop" class="screen full sub" aria-label="Shop">
+      <header class="sub-head">
+        <button class="back" data-back aria-label="Back">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 19l-7-7 7-7" />
+            <path d="M9 12h11" stroke-dasharray="2 2" />
+          </svg>
+        </button>
+        <h2>SHOP</h2>
+        <div class="up-wallet">
+          <div class="pill">
+            <svg class="shard-svg" viewBox="0 0 24 24" aria-hidden="true">
+              <polygon class="f" points="12 2 19 9 12 22 5 9" />
+              <polygon points="12 2 19 9 12 22 5 9" />
+              <polyline points="5 9 12 12 19 9" />
+              <line x1="12" y1="2" x2="12" y2="22" />
+              <polyline points="8.5 5.5 12 9 15.5 5.5" />
+            </svg>
+            <b id="shop-shards">0</b>
+          </div>
+          <button
+            id="btn-free-shards-shop"
+            class="free-shards-btn"
+            title="Add 1,000 Shards"
+          >
+            +1,000
+          </button>
+        </div>
+      </header>
+
+      <!-- Top Category Bar -->
+      <div
+        id="shop-tabs"
+        class="shop-tabs"
+        role="tablist"
+        aria-label="Shop Categories"
+      >
+        <button
+          class="shop-tab active"
+          data-shop-tab="boosters"
+          role="tab"
+          aria-selected="true"
+        >
+          Boosters
+        </button>
+        <button
+          class="shop-tab"
+          data-shop-tab="skins"
+          role="tab"
+          aria-selected="false"
+        >
+          Bullets
+        </button>
+        <button
+          class="shop-tab"
+          data-shop-tab="auras"
+          role="tab"
+          aria-selected="false"
+        >
+          Auras
+        </button>
+        <button
+          class="shop-tab"
+          data-shop-tab="kfx"
+          role="tab"
+          aria-selected="false"
+        >
+          Kill FX
+        </button>
+        <button
+          class="shop-tab"
+          data-shop-tab="shocks"
+          role="tab"
+          aria-selected="false"
+        >
+          Pulses
+        </button>
+      </div>
+
+      <!-- Category Panes (Only active category is shown) -->
+      <div id="shop-scroll" class="scroll armory-scroll">
+        <div class="shop-pane active" data-shop-pane="boosters">
+          <div class="armory-sec-head">
+            <span>TACTICAL RUN BOOSTERS (1-RUN CONSUMABLES)</span>
+          </div>
+          <div id="boosters-list" class="cosmetics-grid"></div>
+        </div>
+
+        <div class="shop-pane" data-shop-pane="skins">
+          <div class="armory-sec-head">
+            <span>BULLET TRAILS &amp; SKINS</span>
+          </div>
+          <div id="bullet-skins-list" class="cosmetics-grid"></div>
+        </div>
+
+        <div class="shop-pane" data-shop-pane="auras">
+          <div class="armory-sec-head">
+            <span>CORE HALOS &amp; AURAS</span>
+          </div>
+          <div id="core-auras-list" class="cosmetics-grid"></div>
+        </div>
+
+        <div class="shop-pane" data-shop-pane="kfx">
+          <div class="armory-sec-head">
+            <span>ENEMY SHATTER EFFECTS</span>
+          </div>
+          <div id="kill-effects-list" class="cosmetics-grid"></div>
+        </div>
+
+        <div class="shop-pane" data-shop-pane="shocks">
+          <div class="armory-sec-head">
+            <span>SHOCKWAVE PULSE STYLES</span>
+          </div>
+          <div id="shock-styles-list" class="cosmetics-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────── Stats & 18 Achievements ───────── -->
+    <section id="screen-stats" class="screen full sub" aria-label="Stats">
+      <header class="sub-head">
+        <button class="back" data-back aria-label="Back">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 19l-7-7 7-7" />
+            <path d="M9 12h11" stroke-dasharray="2 2" />
+          </svg>
+        </button>
+        <h2>STATS</h2>
+        <span class="pill-spacer"></span>
+      </header>
+      <div class="scroll">
+        <dl id="stats-list" class="stats-list"></dl>
+        <h3 class="sec">ACHIEVEMENTS &amp; BOUNTIES</h3>
+        <div id="ach-list" class="ach-list"></div>
+      </div>
+    </section>
+
+    <!-- ───────── Settings ───────── -->
+    <section id="screen-settings" class="screen full sub" aria-label="Settings">
+      <header class="sub-head">
+        <button class="back" data-back aria-label="Back">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 19l-7-7 7-7" />
+            <path d="M9 12h11" stroke-dasharray="2 2" />
+          </svg>
+        </button>
+        <h2>SETTINGS</h2>
+        <span class="pill-spacer"></span>
+      </header>
+      <div class="scroll settings-list">
+        <button id="set-sound" class="toggle" role="switch" aria-checked="true">
+          <span>Sound effects</span><i></i>
+        </button>
+        <button id="set-music" class="toggle" role="switch" aria-checked="true">
+          <span>Music</span><i></i>
+        </button>
+        <button
+          id="set-vibration"
+          class="toggle"
+          role="switch"
+          aria-checked="true"
+        >
+          <span>Vibration</span><i></i>
+        </button>
+        <button
+          id="set-damageNumbers"
+          class="toggle"
+          role="switch"
+          aria-checked="true"
+        >
+          <span>Damage numbers</span><i></i>
+        </button>
+        <button id="btn-reset" class="btn btn-danger">Reset progress</button>
+      </div>
+    </section>
+
+    <!-- ───────── Reset confirmation ───────── -->
+    <div
+      id="dialog-reset"
+      class="dialog"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="reset-title"
+    >
+      <div class="dialog-card">
+        <h3 id="reset-title">Reset all progress?</h3>
+        <p>
+          Shards, skill tree upgrades, unlocked worlds, chassis, boss runes,
+          shop items, achievements and stats will be erased. Your settings are
+          kept.
+        </p>
+        <div class="dialog-actions">
+          <button id="btn-reset-no" class="btn btn-primary">
+            Keep my progress
+          </button>
+          <button id="btn-reset-yes" class="btn btn-danger">
+            Erase everything
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <noscript>Core needs JavaScript to run.</noscript>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
